@@ -9,4 +9,4 @@ npm install
 gulp
 ```
 
-If you decide to adopt this repo for your elm development, I suggest npm-installing a CSS compiler like stylus or sass, both of these are available as gulp plugins. 
+If you decide to adopt this repo for your elm development, I suggest npm-installing a CSS compiler like stylus or sass, both of these are available as gulp plugins. As it stands the directory structure src/elm/main.elm is excessive. The idea is that one will be developing with css and html files too, which need their own source files and directories.
