@@ -5,6 +5,8 @@ In this repo, there is a gulp file, that compiles main.elm to public/elm.js, and
 To get started, enter into your terminal..
 
 ```
+git clone https://github.com/Chadtech/gulp-elm-boilerplate.git
+cd gulp-elm-boilerplate
 npm install
 gulp
 ```
