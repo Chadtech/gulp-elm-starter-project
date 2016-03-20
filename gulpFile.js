@@ -6,11 +6,11 @@ var cp         = require('child_process');
 
 var dest = 'public';
 var src  = {
-  elm: 'src/main.elm'
+  elm: 'src//elm/main.elm'
 } 
 
 gulp.task('watch', function() {
-  autowatch(gulp, {elm: 'src/*.elm'});
+  autowatch(gulp, {elm: 'src/elm/*.elm'});
 });
 
 gulp.task('elm', function() {
