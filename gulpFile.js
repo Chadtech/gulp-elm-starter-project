@@ -14,10 +14,10 @@ gulp.task('watch', function() {
 });
 
 gulp.task('elm', function() {
-  var cmd = 'elm-make ';
-  cmd    += src.elm;
-  cmd    += ' --output ';
-  cmd    += dest + '/elm.js';
+  var cmd  = 'elm-make ';
+      cmd += src.elm;
+      cmd += ' --output ';
+      cmd += dest + '/elm.js';
 
   cp.exec(cmd, function(error, stdout){
     if (error){
