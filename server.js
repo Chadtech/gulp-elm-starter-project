@@ -1,24 +1,25 @@
-var fs         = require('fs');
-var express    = require('express');
-var app        = express();
-var http       = require('http');
-var join       = require('path').join;
+var fs = require('fs');
+var express = require('express');
+var app = express();
+var http = require('http');
+var join = require('path').join;
 var bodyParser = require('body-parser');
 
-app.use(bodyParser.json());
+module.exports = function (PORT, log) {
 
-var PORT = Number(process.env.PORT || 2999);
+  app.use(bodyParser.json());
 
-app.use(express.static(join(__dirname, '/public')));
+  app.use(express.static(join(__dirname, '/dev')));
 
-app.get('/', function(request, response, next) {
-  var indexPage;
-  indexPage = join(__dirname, '/public/index.html');
-  return response.status(200).sendFile(indexPage);
-});
+  app.get('/',function(req, res, next) {
+    var indexPage = join(__dirname, 'dev/index.html');
+    return res.status(200).sendFile(indexPage);
+  })
 
-httpServer = http.createServer(app);
+  var httpServer = http.createServer(app);
 
-httpServer.listen(PORT, function() {
-  return console.log('SERVER RUNNING ON ' + PORT);
-});
+  httpServer.listen(PORT, function(){
+    log("Server running on ", PORT);
+  })
+
+}
