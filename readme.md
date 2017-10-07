@@ -8,7 +8,7 @@ Its basically a template development environment with my favorite tooling and wh
 
 How to get going..
 ```
-> git clone https://github.com/Chadtech/elm-gulp-browserify-boilerplate new-project
+> git clone https://github.com/Chadtech/gulp-elm-boilerplate.git new-project
 > cd new-project
 > npm install
 > elm package install --yes
