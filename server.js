@@ -9,10 +9,10 @@ module.exports = function (PORT, log) {
 
   app.use(bodyParser.json());
 
-  app.use(express.static(join(__dirname, '/dev')));
+  app.use(express.static(join(__dirname, '/public')));
 
   app.get('/',function(req, res, next) {
-    var indexPage = join(__dirname, 'dev/index.html');
+    var indexPage = join(__dirname, 'public/index.html');
     return res.status(200).sendFile(indexPage);
   })
 

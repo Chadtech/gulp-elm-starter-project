@@ -1,28 +1,13 @@
 {
-  "name": "elm-gulp-browserify-boilerplate",
+  "name": "elm-gulp",
   "version": "1.0.0",
-  "description": "Elm Gulp Browserify Boilerplate",
+  "description": "Gulp - Elm boilerplate",
   "main": "gulpFile.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Chadtech/elm-gulp-browserify-boilerplate"
-  },
-  "keywords": [
-    "elm",
-    "elmlang",
-    "gulp",
-    "boilerplate",
-    "browserify"
-  ],
   "dependencies": {
     "body-parser": "^1.15.0",
-    "browserify": "^13.0.0",
     "express": "^4.13.4",
     "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-copy": "^1.0.0",
-    "gulp-stylus": "^2.3.1",
-    "gulp-util": "^3.0.8",
+    "gulp-autowatch": "^1.0.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   },
@@ -31,6 +16,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "gulp"
   },
-  "author": "Chadtech chadtech0@gmail.com",
-  "license": "you can use it"
+  "author": "Chadtech",
+  "license": "ISC"
 }

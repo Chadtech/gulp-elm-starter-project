@@ -1,10 +1,22 @@
 body {
-  background: #293415;
-  padding: 0;
-  margin: 0;
+    background-color: #fcf7f9;
 }
 
-.point {
-  color: #907c1f;
-  font-size: 8em;
+.app-nameField {
+    font-family: Arial;
+    color: #030907;
+    font-size: 2em;
+    background-color: #f9fcfb;
+    border: 2px solid #d0b5a9;
+    outline: none;
+    width: 500px;
+}
+
+.app-namePoint {
+    font-family: Arial;
+    color: #030907;
+}
+
+.app-namePoint.app-nameBig {
+    font-size: 4em;
 }

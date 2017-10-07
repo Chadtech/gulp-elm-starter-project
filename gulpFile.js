@@ -2,21 +2,16 @@ var gulp = require("gulp");
 var source = require("vinyl-source-stream");
 var buffer = require("vinyl-buffer");
 var cp = require("child_process");
-var stylus = require("gulp-stylus");
-var coffeeify = require("coffeeify");
 var browserify = require("browserify");
-var copy = require("gulp-copy");
-var concat = require("gulp-concat");
 var util = require("gulp-util");
 
 
 var paths = {
-  dev: "./dev",
+  public: "./public",
   dist: "./dist",
-  mainElm: "./source/Main.elm",
-  elm: "./source/**/*.elm",
-  css: "./source/**/*.styl",
-  js: "./source/*.js"
+  mainElm: "./src/Main.elm",
+  elm: "./src/**/*.elm",
+  js: "./src/*.js"
 };
 
 
@@ -24,21 +19,13 @@ var production = false;
 
 
 gulp.task("js", function() {
-  return browserify("./source/app.js", {
+  return browserify("./src/app.js", {
     debug: !production,
     cache: {},
   }).bundle()
     .pipe(source("app.js"))
     .pipe(buffer())
-    .pipe(gulp.dest(paths.dev));
-});
-
-gulp.task("stylus", function() {
-  return gulp
-    .src([ "./source/main.styl", paths.css ])
-    .pipe(concat("style.styl"))
-    .pipe(stylus())
-    .pipe(gulp.dest(paths.dev));
+    .pipe(gulp.dest(paths.public));
 });
 
 
@@ -49,18 +36,29 @@ gulp.task("elm", ["elm-make"]);
 
 
 gulp.task("elm-format", function() {
-  var formatCmd = "elm-format ./source --yes";
+  var formatCmd = "elm-format ./src --yes";
   cp.exec(formatCmd, function(error, stdout) {})
 })
 
 
-gulp.task("elm-make", function () {
- var cmd;
+function makeCss () {
+  var cmd = [
+    "elm-css",
+    "src/Stylesheets.elm"
+  ].join(" ");
 
-  cmd = "elm-make ";
-  cmd += paths.mainElm;
-  cmd += " --output ";
-  cmd += paths.dev + "/elm.js";
+  cp.exec(cmd);
+}
+
+gulp.task("elm-make", function () {
+  var cmd = [
+    "elm-make",
+    paths.mainElm,
+    "--output",
+    paths.public + "/elm.js",
+  ].join(" ");
+
+  makeCss();
 
   cp.exec(cmd, function(error, stdout) {
     if (error) {
@@ -86,15 +84,14 @@ gulp.task("dist", function() {
   gulp.task("default");
 
   return gulp
-    .src(paths.dev + "/**/*")
+    .src(paths.public + "/**/*")
     .pipe(gulp.dest(paths.dist));
 })
 
 
 gulp.watch(paths.elm, ["elm"]);
-gulp.watch(paths.css, ["stylus"]);
 gulp.watch(paths.js, ["js"]);
-gulp.watch("dev/index.html", ["server"])
+gulp.watch("public/index.html", ["server"])
 
 
-gulp.task("default", ["elm", "js", "stylus", "server"]);
+gulp.task("default", ["elm", "js", "server"]);
