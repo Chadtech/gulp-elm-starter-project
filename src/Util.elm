@@ -5,7 +5,7 @@ import Html.Styled.Events exposing (keyCode, on)
 import Json.Decode as Decode exposing (Decoder)
 
 
--- GENERAL --
+-- MAYBE --
 
 
 maybeCons : Maybe a -> List a -> List a
@@ -16,6 +16,10 @@ maybeCons maybe list =
 
         Nothing ->
             list
+
+
+
+-- LIST --
 
 
 contains : List a -> a -> Bool

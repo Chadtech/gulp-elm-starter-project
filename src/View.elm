@@ -1,8 +1,5 @@
 module View exposing (view)
 
---import Html
---import Html exposing (Attribute, Html, div, input, p, text)
-
 import Css exposing (..)
 import Html.Custom exposing (input, p)
 import Html.Styled as Html exposing (Attribute, Html, div)
@@ -35,10 +32,6 @@ view model =
         , enterCount model
         , squareOfCount model
         ]
-
-
-
--- COMPONENTS --
 
 
 title : Html Msg
