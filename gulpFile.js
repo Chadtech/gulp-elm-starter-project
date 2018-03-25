@@ -14,68 +14,47 @@ var paths = {
   js: "./src/*.js"
 };
 
-
-var production = false;
-
-
 gulp.task("js", function() {
-  return browserify("./src/app.js", {
-    debug: !production,
-    cache: {},
-  }).bundle()
+  return browserify("./src/app.js")
+    .bundle()
     .pipe(source("app.js"))
     .pipe(buffer())
     .pipe(gulp.dest(paths.public));
 });
 
 
-// Uncomment out for automatic formatting
-// gulp.task("elm", ["elm-format", "elm-make"]);
 gulp.task("elm", ["elm-make"]);
 
-
-
-gulp.task("elm-format", function() {
-  var formatCmd = "elm-format ./src --yes";
-  cp.exec(formatCmd, function(error, stdout) {})
-})
-
-
-function makeCss () {
-  var cmd = [
-    "elm-css",
-    "src/Stylesheets.elm"
-  ].join(" ");
-
-  cp.exec(cmd);
-}
-
-gulp.task("elm-make", function () {
+gulp.task("elm-make", function() {
   var cmd = [
     "elm-make",
     paths.mainElm,
+    "--warn",
     "--output",
-    paths.public + "/elm.js",
+    paths.public + "/elm.js"
   ].join(" ");
-
-  cp.exec(cmd, function(error, stdout) {
+  return cp.exec(cmd, function(error, stdout, stderr) {
     if (error) {
-      util.log(util.colors.cyan("Elm"),
-        util.colors.red(String(error))
-      );
-    } 
-    var stdout = stdout.slice(0, stdout.length - 1);
-
-    stdout.split("\n").forEach(function(line) {
-      util.log(util.colors.cyan("Elm"), line);
-    })
-  }); 
-})
+      error = (String(error)).slice(0, (String(error)).length - 1);
+      (error.split("\n")).forEach(function(line) {
+        return util.log(util.colors.red(String(line)));
+      });
+    } else {
+      stderr = stderr.slice(0, stderr.length - 1);
+      (stderr.split("\n")).forEach(function(line) {
+        return util.log(util.colors.yellow(String(line)));
+      });
+    }
+    stdout = stdout.slice(0, stdout.length - 1);
+    return (stdout.split("\n")).forEach(function(line) {
+      return util.log(util.colors.cyan("Elm"), line);
+    });
+  });
+});
 
 gulp.task("server", function() {
   return require("./server")(2960, util.log);
 });
-
 
 gulp.task("dist", function() {
   production = true;
@@ -86,10 +65,7 @@ gulp.task("dist", function() {
     .pipe(gulp.dest(paths.dist));
 })
 
-
 gulp.watch(paths.elm, ["elm"]);
 gulp.watch(paths.js, ["js"]);
-gulp.watch("public/index.html", ["server"])
-
 
 gulp.task("default", ["elm", "js", "server"]);
