@@ -1,9 +1,11 @@
 module Main exposing (..)
 
+import Cmd.Extra exposing (withCmds, withNoCmd)
 import Html
-import Ports exposing (ReceiveMsg(..), SendMsg(..))
-import Types exposing (Model, Msg(..), init)
-import Util exposing ((&))
+import Html.Styled exposing (toUnstyled)
+import Model exposing (Model)
+import Msg exposing (Msg(..))
+import Ports exposing (JsMsg(ConsoleLog, Square))
 import View exposing (view)
 
 
@@ -12,12 +14,21 @@ import View exposing (view)
 
 main : Program Never Model Msg
 main =
-    Html.program
-        { init = ( init, Cmd.none )
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
+    { init = init
+    , view = toUnstyled << view
+    , update = update
+    , subscriptions = subscriptions
+    }
+        |> Html.program
+
+
+init : ( Model, Cmd Msg )
+init =
+    { field = ""
+    , timesEnterWasPressed = 0
+    , squareOfEnterPresses = 0
+    }
+        |> withNoCmd
 
 
 
@@ -26,7 +37,7 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Ports.fromJs (HandleJsMsg << Ports.decodeReceiveMsg)
+    Ports.fromJs Msg.decode
 
 
 
@@ -37,27 +48,25 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         UpdateField str ->
-            { model
-                | field = str
-            }
-                & Cmd.none
+            { model | field = str }
+                |> withNoCmd
 
         EnterHappened ->
-            { model
-                | timesEnterWasPressed =
+            let
+                newCount =
                     model.timesEnterWasPressed + 1
+            in
+            { model
+                | timesEnterWasPressed = newCount
             }
-                & Ports.sendToJs (ConsoleLog model.field)
+                |> withCmds
+                    [ Ports.send (ConsoleLog model.field)
+                    , Ports.send (Square newCount)
+                    ]
 
-        HandleJsMsg (Ok receiveMsg) ->
-            handleRecieveMsg receiveMsg model
+        ReceivedSquare square ->
+            { model | squareOfEnterPresses = square }
+                |> withNoCmd
 
-        HandleJsMsg (Err err) ->
-            model & Cmd.none
-
-
-handleRecieveMsg : ReceiveMsg -> Model -> ( Model, Cmd Msg )
-handleRecieveMsg receiveMsg model =
-    case receiveMsg of
-        ConsoleLogHappened ->
-            model & Cmd.none
+        MsgDecodeFailed _ ->
+            model |> withNoCmd

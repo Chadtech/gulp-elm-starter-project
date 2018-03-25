@@ -58,8 +58,6 @@ gulp.task("elm-make", function () {
     paths.public + "/elm.js",
   ].join(" ");
 
-  makeCss();
-
   cp.exec(cmd, function(error, stdout) {
     if (error) {
       util.log(util.colors.cyan("Elm"),
@@ -75,7 +73,7 @@ gulp.task("elm-make", function () {
 })
 
 gulp.task("server", function() {
-  return require("./server")(2984, util.log);
+  return require("./server")(2960, util.log);
 });
 
 

@@ -14,7 +14,7 @@ How to get going..
 > elm package install --yes
 > gulp
 
-then open up http://localhost:2984
+then open up http://localhost:2960
 ```
 
 
@@ -23,16 +23,12 @@ This repo is organized as ..
 ./public
 ├── app.js
 ├── elm.js
-├── index.html
-└── style.css
+└── index.html
 ./src
 ├── Main.elm
 ├── Ports.elm
-├── Styles
-│   └── Shared.elm
-├── Styles.elm
-├── Stylesheets.elm
-├── Types.elm
+├── Msg.elm
+├── Model.elm
 ├── Util.elm
 ├── View.elm
 └── app.js

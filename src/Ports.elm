@@ -1,48 +1,41 @@
-port module Ports exposing (..)
+port module Ports
+    exposing
+        ( JsMsg(..)
+        , fromJs
+        , send
+        )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
-import Util exposing ((:=))
 
 
-type SendMsg
+type JsMsg
     = ConsoleLog String
+    | Square Int
 
 
-type ReceiveMsg
-    = ConsoleLogHappened
+toCmd : String -> Value -> Cmd msg
+toCmd type_ payload =
+    [ ( "type", Encode.string type_ )
+    , ( "payload", payload )
+    ]
+        |> Encode.object
+        |> toJs
 
 
-sendToJs : SendMsg -> Cmd msg
-sendToJs msg =
+noPayload : String -> Cmd msg
+noPayload type_ =
+    toCmd type_ Encode.null
+
+
+send : JsMsg -> Cmd msg
+send msg =
     case msg of
         ConsoleLog str ->
-            [ "type" := Encode.string "console log"
-            , "payload" := Encode.string str
-            ]
-                |> Encode.object
-                |> toJs
+            toCmd "consoleLog" (Encode.string str)
 
-
-decodeReceiveMsg : Value -> Result String ReceiveMsg
-decodeReceiveMsg json =
-    Decode.decodeValue (receive json) json
-
-
-receive : Value -> Decoder ReceiveMsg
-receive json =
-    Decode.field "type" Decode.string
-        |> Decode.andThen (receiveMsgDecoder json)
-
-
-receiveMsgDecoder : Value -> String -> Decoder ReceiveMsg
-receiveMsgDecoder json string =
-    case string of
-        "console log happened" ->
-            Decode.succeed ConsoleLogHappened
-
-        _ ->
-            Decode.fail "Not a valid receive msg type"
+        Square int ->
+            toCmd "square" (Encode.int int)
 
 
 port toJs : Value -> Cmd msg
