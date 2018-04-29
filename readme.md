@@ -26,7 +26,6 @@ package-lock.json
 package.json
 public
 ├── app.js
-├── desktop-elm.js
 ├── elm.js
 └── index.html
 readme.md
