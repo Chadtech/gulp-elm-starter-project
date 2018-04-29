@@ -11,12 +11,7 @@ type Msg
     = UpdateField String
     | EnterHappened
     | ReceivedSquare Int
-    | MsgDecodeFailed DecodeProblem
-
-
-type DecodeProblem
-    = Other String
-    | UnrecognizedMsgType String
+    | MsgDecodeFailed String
 
 
 decode : Value -> Msg
@@ -26,7 +21,7 @@ decode json =
             msg
 
         Err err ->
-            MsgDecodeFailed (Other err)
+            MsgDecodeFailed err
 
 
 decoder : Decoder Msg
@@ -45,7 +40,4 @@ toMsg type_ =
                 |> Decode.map ReceivedSquare
 
         _ ->
-            type_
-                |> UnrecognizedMsgType
-                |> MsgDecodeFailed
-                |> Decode.succeed
+            Decode.fail ("Unrecognized Msg type -> " ++ type_)

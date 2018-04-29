@@ -14,24 +14,31 @@ How to get going..
 > elm package install --yes
 > gulp
 
-then open up http://localhost:2960
+then open up http://localhost:2957
 ```
 
 
 This repo is organized as ..
 ```
-./public
+elm-package.json
+gulpFile.js
+package-lock.json
+package.json
+public
 ├── app.js
+├── desktop-elm.js
 ├── elm.js
 └── index.html
-./src
+readme.md
+server.js
+src
+├── Html
+│   └── Custom.elm
 ├── Main.elm
-├── Ports.elm
-├── Msg.elm
 ├── Model.elm
+├── Msg.elm
+├── Ports.elm
 ├── Util.elm
 ├── View.elm
 └── app.js
-gulpFile.js
-server.js
 ```

@@ -23,37 +23,24 @@ gulp.task("js", function() {
 });
 
 
-gulp.task("elm", ["elm-make"]);
-
-gulp.task("elm-make", function() {
-  var cmd = [
-    "elm-make",
-    paths.mainElm,
-    "--warn",
-    "--output",
-    paths.public + "/elm.js"
-  ].join(" ");
-  return cp.exec(cmd, function(error, stdout, stderr) {
-    if (error) {
-      error = (String(error)).slice(0, (String(error)).length - 1);
-      (error.split("\n")).forEach(function(line) {
-        return util.log(util.colors.red(String(line)));
-      });
-    } else {
-      stderr = stderr.slice(0, stderr.length - 1);
-      (stderr.split("\n")).forEach(function(line) {
-        return util.log(util.colors.yellow(String(line)));
-      });
-    }
-    stdout = stdout.slice(0, stdout.length - 1);
-    return (stdout.split("\n")).forEach(function(line) {
-      return util.log(util.colors.cyan("Elm"), line);
-    });
+gulp.task("elm", function() {
+  util.log(util.colors.cyan("Elm"), "starting");
+  cp.spawn("elm-make", [ 
+    paths.mainElm, 
+    "--warn", 
+    "--output", 
+    paths.public + "/elm.js",
+    "--yes"
+  ], {
+    stdio: 'inherit'
+  }).on("close", function(code) {
+    util.log(util.colors.cyan("Elm"), "closed");
   });
 });
 
+
 gulp.task("server", function() {
-  return require("./server")(2960, util.log);
+  return require("./server")(2957, util.log);
 });
 
 gulp.task("dist", function() {

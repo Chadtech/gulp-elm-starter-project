@@ -1,11 +1,11 @@
 module Main exposing (..)
 
-import Cmd.Extra exposing (withCmds, withNoCmd)
 import Html
 import Html.Styled exposing (toUnstyled)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Ports exposing (JsMsg(ConsoleLog, Square))
+import Return2 exposing (withCmds, withNoCmd)
 import View exposing (view)
 
 
