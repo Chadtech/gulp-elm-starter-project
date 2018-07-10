@@ -1,11 +1,9 @@
 module Main exposing (..)
 
-import Html
-import Html.Styled exposing (toUnstyled)
-import Model exposing (Model)
+import Html exposing (Html)
+import Html.Provider as Provider
+import Model exposing (Model, Status(..))
 import Msg exposing (Msg(..))
-import Ports exposing (JsMsg(ConsoleLog, Square))
-import Return2 exposing (withCmds, withNoCmd)
 import View exposing (view)
 
 
@@ -14,59 +12,47 @@ import View exposing (view)
 
 main : Program Never Model Msg
 main =
-    { init = init
-    , view = toUnstyled << view
+    { model = init
+    , view = Provider.render view
     , update = update
-    , subscriptions = subscriptions
     }
-        |> Html.program
+        |> Html.beginnerProgram
 
 
-init : ( Model, Cmd Msg )
+init : Model
 init =
-    { field = ""
-    , timesEnterWasPressed = 0
-    , squareOfEnterPresses = 0
+    { name = ""
+    , counter = 0
+    , status = Ready
     }
-        |> withNoCmd
-
-
-
--- SUBSCRIPTIONS --
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Ports.fromJs Msg.decode
 
 
 
 -- UPDATE --
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update message model =
-    case message of
-        UpdateField str ->
-            { model | field = str }
-                |> withNoCmd
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        NameFieldUpdated str ->
+            { model | name = str }
 
-        EnterHappened ->
-            let
-                newCount =
-                    model.timesEnterWasPressed + 1
-            in
+        Increment ->
+            { model | counter = model.counter + 1 }
+
+        Decrement ->
+            { model | counter = model.counter - 1 }
+
+        Submit ->
             { model
-                | timesEnterWasPressed = newCount
+                | status =
+                    case ( model.name, model.counter ) of
+                        ( "", _ ) ->
+                            Error "You must have a name to submit"
+
+                        ( _, 0 ) ->
+                            Error "You must have a count greater than 0 to submit"
+
+                        _ ->
+                            Success
             }
-                |> withCmds
-                    [ Ports.send (ConsoleLog model.field)
-                    , Ports.send (Square newCount)
-                    ]
-
-        ReceivedSquare square ->
-            { model | squareOfEnterPresses = square }
-                |> withNoCmd
-
-        MsgDecodeFailed _ ->
-            model |> withNoCmd

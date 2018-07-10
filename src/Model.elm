@@ -1,8 +1,14 @@
-module Model exposing (Model)
+module Model exposing (Model, Status(..))
 
 
 type alias Model =
-    { field : String
-    , timesEnterWasPressed : Int
-    , squareOfEnterPresses : Int
+    { name : String
+    , counter : Int
+    , status : Status
     }
+
+
+type Status
+    = Ready
+    | Error String
+    | Success
