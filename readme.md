@@ -20,7 +20,7 @@ then open up http://localhost:2957
 
 This repo is organized as ..
 ```
-elm-package.json
+elm.json
 gulpFile.js
 package-lock.json
 package.json
@@ -31,12 +31,11 @@ public
 readme.md
 server.js
 src
-├── Html
-│   └── Custom.elm
 ├── Main.elm
 ├── Model.elm
 ├── Msg.elm
 ├── Ports.elm
+├── Style.elm
 ├── Util.elm
 ├── View.elm
 └── app.js
