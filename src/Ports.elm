@@ -1,11 +1,10 @@
-port module Ports
-    exposing
-        ( JsMsg(..)
-        , fromJs
-        , send
-        )
+port module Ports exposing
+    ( JsMsg(..)
+    , fromJs
+    , send
+    )
 
-import Json.Encode as Encode exposing (Value)
+import Json.Encode as E exposing (Value)
 
 
 type JsMsg
@@ -15,26 +14,26 @@ type JsMsg
 
 toCmd : String -> Value -> Cmd msg
 toCmd type_ payload =
-    [ ( "type", Encode.string type_ )
+    [ ( "type", E.string type_ )
     , ( "payload", payload )
     ]
-        |> Encode.object
+        |> E.object
         |> toJs
 
 
 noPayload : String -> Cmd msg
 noPayload type_ =
-    toCmd type_ Encode.null
+    toCmd type_ E.null
 
 
 send : JsMsg -> Cmd msg
 send msg =
     case msg of
         ConsoleLog str ->
-            toCmd "consoleLog" (Encode.string str)
+            toCmd "consoleLog" (E.string str)
 
         Square int ->
-            toCmd "square" (Encode.int int)
+            toCmd "square" (E.int int)
 
 
 port toJs : Value -> Cmd msg

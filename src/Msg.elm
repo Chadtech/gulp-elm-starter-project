@@ -1,22 +1,21 @@
-module Msg
-    exposing
-        ( Msg(..)
-        , decode
-        )
+module Msg exposing
+    ( Msg(..)
+    , decode
+    )
 
-import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode as D exposing (Decoder, Value)
 
 
 type Msg
     = UpdateField String
     | EnterHappened
     | ReceivedSquare Int
-    | MsgDecodeFailed String
+    | MsgDecodeFailed D.Error
 
 
 decode : Value -> Msg
 decode json =
-    case Decode.decodeValue decoder json of
+    case D.decodeValue decoder json of
         Ok msg ->
             msg
 
@@ -26,18 +25,18 @@ decode json =
 
 decoder : Decoder Msg
 decoder =
-    Decode.string
-        |> Decode.field "type"
-        |> Decode.andThen
-            (Decode.field "payload" << toMsg)
+    D.string
+        |> D.field "type"
+        |> D.andThen
+            (D.field "payload" << toMsg)
 
 
 toMsg : String -> Decoder Msg
 toMsg type_ =
     case type_ of
         "square computed" ->
-            Decode.int
-                |> Decode.map ReceivedSquare
+            D.int
+                |> D.map ReceivedSquare
 
         _ ->
-            Decode.fail ("Unrecognized Msg type -> " ++ type_)
+            D.fail ("Unrecognized Msg type -> " ++ type_)

@@ -1,34 +1,36 @@
-module Main exposing (..)
+module Main exposing (init, main, subscriptions, update)
 
-import Html
-import Html.Styled exposing (toUnstyled)
+import Browser
+import Html.Styled
+import Json.Decode as D
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Ports exposing (JsMsg(ConsoleLog, Square))
-import Return2 exposing (withCmds, withNoCmd)
+import Ports exposing (JsMsg)
+import Return2 as R2
 import View exposing (view)
+
 
 
 -- MAIN --
 
 
-main : Program Never Model Msg
+main : Program D.Value Model Msg
 main =
     { init = init
-    , view = toUnstyled << view
+    , view = view
     , update = update
     , subscriptions = subscriptions
     }
-        |> Html.program
+        |> Browser.document
 
 
-init : ( Model, Cmd Msg )
-init =
+init : D.Value -> ( Model, Cmd Msg )
+init json =
     { field = ""
     , timesEnterWasPressed = 0
     , squareOfEnterPresses = 0
     }
-        |> withNoCmd
+        |> R2.withNoCmd
 
 
 
@@ -49,7 +51,7 @@ update message model =
     case message of
         UpdateField str ->
             { model | field = str }
-                |> withNoCmd
+                |> R2.withNoCmd
 
         EnterHappened ->
             let
@@ -59,14 +61,15 @@ update message model =
             { model
                 | timesEnterWasPressed = newCount
             }
-                |> withCmds
-                    [ Ports.send (ConsoleLog model.field)
-                    , Ports.send (Square newCount)
+                |> R2.withCmds
+                    [ Ports.send (Ports.ConsoleLog model.field)
+                    , Ports.send (Ports.Square newCount)
                     ]
 
         ReceivedSquare square ->
             { model | squareOfEnterPresses = square }
-                |> withNoCmd
+                |> R2.withNoCmd
 
         MsgDecodeFailed _ ->
-            model |> withNoCmd
+            model
+                |> R2.withNoCmd
