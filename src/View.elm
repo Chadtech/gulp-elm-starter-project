@@ -1,53 +1,55 @@
 module View exposing (view)
 
+import Browser
 import Css exposing (..)
-import Html.Custom exposing (input, p)
-import Html.Styled as Html exposing (Attribute, Html, div)
-import Html.Styled.Attributes exposing (css, placeholder, spellcheck, value)
+import Html.Styled as Html
+    exposing
+        ( Attribute
+        , Html
+        , div
+        , input
+        , p
+        )
+import Html.Styled.Attributes as Attrs exposing (css)
 import Html.Styled.Events exposing (onInput)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
+import Style
 import Util exposing (onEnter)
 
 
--- STYLES --
-
-
-big : Attribute Msg
-big =
-    [ fontSize (em 4) ]
-        |> css
-
-
-
--- VIEW --
-
-
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    div
-        []
+    { title = "Gulp Elm Boilerplate"
+    , body =
         [ title
         , inputField model
         , enterCount model
         , squareOfCount model
         ]
+            |> List.map Html.toUnstyled
+    }
 
 
 title : Html Msg
 title =
     p
-        [ big ]
+        [ css
+            [ Style.bigFont
+            , Style.pBasic
+            ]
+        ]
         [ Html.text "Elm Project : Go!" ]
 
 
 inputField : Model -> Html Msg
 inputField model =
     input
-        [ value model.field
+        [ css [ Style.inputBasic ]
+        , Attrs.value model.field
         , onInput UpdateField
-        , placeholder "Press enter to console log msg"
-        , spellcheck False
+        , Attrs.placeholder "Press enter to console log msg"
+        , Attrs.spellcheck False
         , onEnter EnterHappened
         ]
         []
@@ -63,7 +65,7 @@ enterCount model =
 enterText : Model -> String
 enterText model =
     [ "Enter was pressed"
-    , toString model.timesEnterWasPressed
+    , String.fromInt model.timesEnterWasPressed
     , "times"
     ]
         |> String.join " "
@@ -79,6 +81,6 @@ squareOfCount model =
 squareText : Model -> String
 squareText model =
     [ "The square of the number of times enter was pressed is"
-    , toString model.squareOfEnterPresses
+    , String.fromInt model.squareOfEnterPresses
     ]
         |> String.join " "

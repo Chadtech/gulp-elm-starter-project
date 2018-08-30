@@ -1,6 +1,6 @@
-var app = Elm.Main.fullscreen();
+var app = Elm.Main.init();
 
-function toElm (type, payload) {
+function toElm(type, payload) {
 	app.ports.fromJs.send({
 		type: type,
 		payload: payload
