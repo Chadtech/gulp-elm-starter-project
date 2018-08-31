@@ -7,7 +7,7 @@ import Json.Decode as D exposing (Decoder, Value)
 
 
 type Msg
-    = UpdateField String
+    = FieldUpdated String
     | EnterHappened
     | ReceivedSquare Int
     | MsgDecodeFailed D.Error
@@ -28,11 +28,11 @@ decoder =
     D.string
         |> D.field "type"
         |> D.andThen
-            (D.field "payload" << toMsg)
+            (D.field "payload" << payloadDecoder)
 
 
-toMsg : String -> Decoder Msg
-toMsg type_ =
+payloadDecoder : String -> Decoder Msg
+payloadDecoder type_ =
     case type_ of
         "square computed" ->
             D.int

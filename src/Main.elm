@@ -49,7 +49,7 @@ subscriptions _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        UpdateField str ->
+        FieldUpdated str ->
             { model | field = str }
                 |> R2.withNoCmd
 

@@ -47,7 +47,7 @@ inputField model =
     input
         [ css [ Style.inputBasic ]
         , Attrs.value model.field
-        , onInput UpdateField
+        , onInput FieldUpdated
         , Attrs.placeholder "Press enter to console log msg"
         , Attrs.spellcheck False
         , onEnter EnterHappened
