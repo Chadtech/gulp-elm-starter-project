@@ -55,6 +55,7 @@ update message model =
 
         EnterHappened ->
             let
+                newCount : Int
                 newCount =
                     model.timesEnterWasPressed + 1
             in
