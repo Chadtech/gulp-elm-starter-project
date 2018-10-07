@@ -31,12 +31,13 @@ public
 readme.md
 server.js
 src
+├── Html
+│   └── Custom.elm
 ├── Main.elm
 ├── Model.elm
 ├── Msg.elm
 ├── Ports.elm
 ├── Style.elm
-├── Util.elm
 ├── View.elm
 └── app.js
 ```

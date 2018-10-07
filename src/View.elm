@@ -2,6 +2,7 @@ module View exposing (view)
 
 import Browser
 import Css exposing (..)
+import Html.Custom
 import Html.Styled as Html
     exposing
         ( Attribute
@@ -15,7 +16,6 @@ import Html.Styled.Events exposing (onInput)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Style
-import Util exposing (onEnter)
 
 
 view : Model -> Browser.Document Msg
@@ -50,7 +50,7 @@ inputField model =
         , onInput FieldUpdated
         , Attrs.placeholder "Press enter to console log msg"
         , Attrs.spellcheck False
-        , onEnter EnterHappened
+        , Html.Custom.onEnter EnterHappened
         ]
         []
 
