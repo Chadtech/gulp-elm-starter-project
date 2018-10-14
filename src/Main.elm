@@ -47,8 +47,8 @@ subscriptions _ =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message model =
-    case message of
+update msg model =
+    case msg of
         FieldUpdated str ->
             { model | field = str }
                 |> R2.withNoCmd
