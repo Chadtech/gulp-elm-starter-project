@@ -1,4 +1,3 @@
-var fs = require('fs');
 var express = require('express');
 var app = express();
 var http = require('http');
@@ -11,14 +10,14 @@ module.exports = function (PORT, log) {
 
   app.use(express.static(join(__dirname, '/public')));
 
-  app.get('/',function(req, res, next) {
+  app.get('/', function (req, res, next) {
     var indexPage = join(__dirname, 'public/index.html');
     return res.status(200).sendFile(indexPage);
   })
 
   var httpServer = http.createServer(app);
 
-  httpServer.listen(PORT, function(){
+  httpServer.listen(PORT, function () {
     log("Server running on ", PORT);
   })
 

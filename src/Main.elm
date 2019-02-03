@@ -1,12 +1,12 @@
-module Main exposing (init, main, subscriptions, update)
+module Main exposing (main)
 
 import Browser
+import Cmd.Extra as CE
 import Html.Styled
-import Json.Decode as D
+import Json.Decode as Decode
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Ports exposing (JsMsg)
-import Return2 as R2
 import View exposing (view)
 
 
@@ -14,7 +14,7 @@ import View exposing (view)
 -- MAIN --
 
 
-main : Program D.Value Model Msg
+main : Program Decode.Value Model Msg
 main =
     { init = init
     , view = view
@@ -24,13 +24,13 @@ main =
         |> Browser.document
 
 
-init : D.Value -> ( Model, Cmd Msg )
+init : Decode.Value -> ( Model, Cmd Msg )
 init json =
     { field = ""
     , timesEnterWasPressed = 0
     , squareOfEnterPresses = 0
     }
-        |> R2.withNoCmd
+        |> CE.withNoCmd
 
 
 
@@ -50,27 +50,32 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         FieldUpdated str ->
-            { model | field = str }
-                |> R2.withNoCmd
+            Model.setField str model
+                |> CE.withNoCmd
 
         EnterHappened ->
             let
-                newCount : Int
-                newCount =
-                    model.timesEnterWasPressed + 1
+                newModel : Model
+                newModel =
+                    Model.incrementTimesEnterWasPressed model
             in
-            { model
-                | timesEnterWasPressed = newCount
-            }
-                |> R2.withCmds
-                    [ Ports.send (Ports.ConsoleLog model.field)
-                    , Ports.send (Ports.Square newCount)
-                    ]
+            ( newModel
+            , logAndSquare newModel
+            )
 
-        ReceivedSquare square ->
-            { model | squareOfEnterPresses = square }
-                |> R2.withNoCmd
+        ReceivedSquare newSquare ->
+            model
+                |> Model.setSquareOfEnterPresses newSquare
+                |> CE.withNoCmd
 
         MsgDecodeFailed _ ->
             model
-                |> R2.withNoCmd
+                |> CE.withNoCmd
+
+
+logAndSquare : Model -> Cmd Msg
+logAndSquare model =
+    [ Ports.send (Ports.ConsoleLog model.field)
+    , Ports.send (Ports.Square model.timesEnterWasPressed)
+    ]
+        |> Cmd.batch
