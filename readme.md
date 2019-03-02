@@ -23,14 +23,13 @@ gulpFile.js
 package-lock.json
 package.json
 public
-├── app.js
-├── elm.js
 └── index.html
 readme.md
 server.js
 src
-├── Html
-│   └── Custom.elm
+├── Util
+│   └── Html.elm
+│   └── Cmd.elm
 ├── Main.elm
 ├── Model.elm
 ├── Msg.elm
