@@ -1,11 +1,11 @@
 module Main exposing (main)
 
 import Browser
-import Cmd.Extra as CE
 import Json.Decode as Decode
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Ports
+import Util.Cmd as CmdUtil
 import View exposing (view)
 
 
@@ -29,7 +29,7 @@ init _ =
     , timesEnterWasPressed = 0
     , squareOfEnterPresses = 0
     }
-        |> CE.withNoCmd
+        |> CmdUtil.withNoCmd
 
 
 
@@ -49,8 +49,9 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         FieldUpdated str ->
-            Model.setField str model
-                |> CE.withNoCmd
+            model
+                |> Model.setField str
+                |> CmdUtil.withNoCmd
 
         EnterHappened ->
             let
@@ -65,11 +66,11 @@ update msg model =
         ReceivedSquare newSquare ->
             model
                 |> Model.setSquareOfEnterPresses newSquare
-                |> CE.withNoCmd
+                |> CmdUtil.withNoCmd
 
         MsgDecodeFailed _ ->
             model
-                |> CE.withNoCmd
+                |> CmdUtil.withNoCmd
 
 
 logAndSquare : Model -> Cmd Msg
