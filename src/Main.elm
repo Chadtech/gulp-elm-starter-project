@@ -2,11 +2,10 @@ module Main exposing (main)
 
 import Browser
 import Cmd.Extra as CE
-import Html.Styled
 import Json.Decode as Decode
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Ports exposing (JsMsg)
+import Ports
 import View exposing (view)
 
 
@@ -25,7 +24,7 @@ main =
 
 
 init : Decode.Value -> ( Model, Cmd Msg )
-init json =
+init _ =
     { field = ""
     , timesEnterWasPressed = 0
     , squareOfEnterPresses = 0

@@ -1,41 +1,40 @@
 module Style exposing
     ( bigFont
     , black
-    , inputBasic
+    , globals
     , lightGray
-    , pBasic
     , red
     , white0
     , white1
     )
 
 import Css exposing (..)
+import Css.Global exposing (global)
+import Html.Styled exposing (Html)
+
+
+globals : Html msg
+globals =
+    [ Css.Global.p
+        [ fontFamilies [ "Arial" ]
+        , color black
+        ]
+    , Css.Global.input
+        [ fontFamilies [ "Arial" ]
+        , color black
+        , fontSize (em 2)
+        , backgroundColor white1
+        , border3 (px 2) solid lightGray
+        , outline none
+        , width (px 500)
+        ]
+    ]
+        |> global
 
 
 bigFont : Style
 bigFont =
     fontSize (em 4)
-
-
-pBasic : Style
-pBasic =
-    [ fontFamilies [ "Arial" ]
-    , color black
-    ]
-        |> Css.batch
-
-
-inputBasic : Style
-inputBasic =
-    [ fontFamilies [ "Arial" ]
-    , color black
-    , fontSize (em 2)
-    , backgroundColor white1
-    , border3 (px 2) solid lightGray
-    , outline none
-    , width (px 500)
-    ]
-        |> Css.batch
 
 
 

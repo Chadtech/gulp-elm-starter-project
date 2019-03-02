@@ -3,16 +3,9 @@ module View exposing (view)
 import Browser
 import Css exposing (..)
 import Html.Custom
-import Html.Styled as Html
-    exposing
-        ( Attribute
-        , Html
-        , div
-        , input
-        , p
-        )
-import Html.Styled.Attributes as Attrs exposing (css)
-import Html.Styled.Events exposing (onInput)
+import Html.Styled as Html exposing (Html)
+import Html.Styled.Attributes as Attrs
+import Html.Styled.Events as Events
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Style
@@ -22,7 +15,8 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "Gulp Elm Boilerplate"
     , body =
-        [ title
+        [ Style.globals
+        , title
         , inputField model
         , enterCount model
         , squareOfCount model
@@ -33,21 +27,16 @@ view model =
 
 title : Html Msg
 title =
-    p
-        [ css
-            [ Style.bigFont
-            , Style.pBasic
-            ]
-        ]
+    Html.p
+        [ Attrs.css [ Style.bigFont ] ]
         [ Html.text "Elm Project : Go!" ]
 
 
 inputField : Model -> Html Msg
 inputField model =
-    input
-        [ css [ Style.inputBasic ]
-        , Attrs.value model.field
-        , onInput FieldUpdated
+    Html.input
+        [ Attrs.value model.field
+        , Events.onInput FieldUpdated
         , Attrs.placeholder "Press enter to console log msg"
         , Attrs.spellcheck False
         , Html.Custom.onEnter EnterHappened
@@ -57,7 +46,7 @@ inputField model =
 
 enterCount : Model -> Html Msg
 enterCount model =
-    p
+    Html.p
         []
         [ Html.text (enterText model) ]
 
@@ -73,7 +62,7 @@ enterText model =
 
 squareOfCount : Model -> Html Msg
 squareOfCount model =
-    p
+    Html.p
         []
         [ Html.text (squareText model) ]
 
