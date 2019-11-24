@@ -18,6 +18,12 @@ type JsMsg
     | Square Int
 
 
+
+--------------------------------------------------------------------------------
+-- HEPERS --
+--------------------------------------------------------------------------------
+
+
 toCmd : String -> Encode.Value -> Cmd msg
 toCmd type_ payload =
     [ ( "type", Encode.string type_ )
