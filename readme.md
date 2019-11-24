@@ -31,10 +31,6 @@ src
 │   └── Html.elm
 │   └── Cmd.elm
 ├── Main.elm
-├── Model.elm
-├── Msg.elm
-├── Ports.elm
 ├── Style.elm
-├── View.elm
 └── app.js
 ```
