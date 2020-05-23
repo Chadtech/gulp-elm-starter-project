@@ -84,46 +84,6 @@ init _ =
 
 
 --------------------------------------------------------------------------------
--- SUBSCRIPTIONS --
---------------------------------------------------------------------------------
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    fromJs decodeMsg
-
-
-decodeMsg : Decode.Value -> Msg
-decodeMsg json =
-    let
-        decoder : Decoder Msg
-        decoder =
-            Decode.string
-                |> Decode.field "type"
-                |> Decode.andThen
-                    (Decode.field "payload" << payloadDecoder)
-    in
-    case Decode.decodeValue decoder json of
-        Ok msg ->
-            msg
-
-        Err err ->
-            MsgDecodeFailed err
-
-
-payloadDecoder : String -> Decoder Msg
-payloadDecoder type_ =
-    case type_ of
-        "square computed" ->
-            Decode.int
-                |> Decode.map ReceivedSquare
-
-        _ ->
-            Decode.fail ("Unrecognized Msg type -> " ++ type_)
-
-
-
---------------------------------------------------------------------------------
 -- UPDATE --
 --------------------------------------------------------------------------------
 
@@ -162,37 +122,6 @@ logAndSquare model =
     , sendToJs (Square model.timesEnterWasPressed)
     ]
         |> Cmd.batch
-
-
-
---------------------------------------------------------------------------------
--- PORTS --
---------------------------------------------------------------------------------
-
-
-port toJs : Encode.Value -> Cmd msg
-
-
-port fromJs : (Encode.Value -> msg) -> Sub msg
-
-
-sendToJs : JsMsg -> Cmd msg
-sendToJs msg =
-    let
-        toCmd : String -> Encode.Value -> Cmd msg
-        toCmd type_ payload =
-            [ ( "type", Encode.string type_ )
-            , ( "payload", payload )
-            ]
-                |> Encode.object
-                |> toJs
-    in
-    case msg of
-        ConsoleLog str ->
-            toCmd "consoleLog" (Encode.string str)
-
-        Square int ->
-            toCmd "square" (Encode.int int)
 
 
 
@@ -263,3 +192,74 @@ squareText model =
     , String.fromInt model.squareOfEnterPresses
     ]
         |> String.join " "
+
+
+
+--------------------------------------------------------------------------------
+-- SUBSCRIPTIONS --
+--------------------------------------------------------------------------------
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    fromJs decodeMsg
+
+
+decodeMsg : Decode.Value -> Msg
+decodeMsg json =
+    let
+        decoder : Decoder Msg
+        decoder =
+            Decode.string
+                |> Decode.field "type"
+                |> Decode.andThen
+                    (Decode.field "payload" << payloadDecoder)
+    in
+    case Decode.decodeValue decoder json of
+        Ok msg ->
+            msg
+
+        Err err ->
+            MsgDecodeFailed err
+
+
+payloadDecoder : String -> Decoder Msg
+payloadDecoder type_ =
+    case type_ of
+        "square computed" ->
+            Decode.int
+                |> Decode.map ReceivedSquare
+
+        _ ->
+            Decode.fail ("Unrecognized Msg type -> " ++ type_)
+
+
+
+--------------------------------------------------------------------------------
+-- PORTS --
+--------------------------------------------------------------------------------
+
+
+port toJs : Encode.Value -> Cmd msg
+
+
+port fromJs : (Encode.Value -> msg) -> Sub msg
+
+
+sendToJs : JsMsg -> Cmd msg
+sendToJs msg =
+    let
+        toCmd : String -> Encode.Value -> Cmd msg
+        toCmd type_ payload =
+            [ ( "type", Encode.string type_ )
+            , ( "payload", payload )
+            ]
+                |> Encode.object
+                |> toJs
+    in
+    case msg of
+        ConsoleLog str ->
+            toCmd "consoleLog" (Encode.string str)
+
+        Square int ->
+            toCmd "square" (Encode.int int)
