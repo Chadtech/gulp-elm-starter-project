@@ -1,7 +1,7 @@
 {
   "name": "elm-gulp",
   "version": "1.0.0",
-  "description": "Gulp - Elm boilerplate",
+  "description": "Gulp Elm Starter Project",
   "main": "gulpFile.js",
   "dependencies": {},
   "devDependencies": {
