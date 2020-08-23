@@ -1,10 +1,11 @@
 const { src, dest, parallel, series, watch } = require('gulp');
 const elm = require('gulp-elm');
 const fs = require('fs');
-const http require('http');
+const server = require('./server');
 
 const model = {
     optimizeElm : false,
+    server: null
 };
 
 function devDestDir(path) {
@@ -37,20 +38,11 @@ function compile_js() {
     return src("src/app.js").pipe(dest(devDestDir()));
 }
 
-function dev_server() {
-    const requestListener = function (req, res) {
-        res.writeHead(200);
-        res.end('Hello, World!');
-    }
-
-    const server = http.createServer(requestListener);
-    server.listen(8080);
-}
-
 exports.dev = function() {
     parallel(compile_elm, compile_js)();
     watch("src/**/*.elm", compile_elm);
     watch("src/app.js", compile_js);
+    server(6888, console.log);
 }
 
 exports.buildProd = function(cb) {

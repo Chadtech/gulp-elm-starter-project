@@ -1,9 +1,9 @@
 var app = Elm.Main.init();
 
-function toElm(type, payload) {
+function toElm(type, body) {
 	app.ports.fromJs.send({
 		type: type,
-		payload: payload
+		body: body
 	});
 }
 
@@ -22,7 +22,7 @@ function jsMsgHandler(msg) {
 		console.log("Unrecognized js msg type ->", msg.type);
 		return;
 	}
-	action(msg.payload);
+	action(msg.body);
 }
 
 app.ports.toJs.subscribe(jsMsgHandler)
