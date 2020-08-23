@@ -9,7 +9,8 @@
     "elm-test": "^0.19.1-revision2",
     "express": "^4.17.1",
     "gulp": "^4.0.2",
-    "gulp-elm": "^0.8.2"
+    "gulp-elm": "^0.8.2",
+    "lodash": "^4.17.20"
   },
   "scripts": {
     "test": "./node_modules/.bin/elm-test",
