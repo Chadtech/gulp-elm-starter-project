@@ -1,60 +1,16 @@
-port module Main exposing (main)
+module Main exposing (main)
 
-import Browser
+import Browser exposing (UrlRequest)
+import Browser.Navigation as Nav
 import Html.Styled as Html exposing (Html)
-import Html.Styled.Attributes as Attrs
-import Html.Styled.Events as Events
 import Json.Decode as Decode exposing (Decoder)
-import Json.Encode as Encode
-import Style
+import Layout exposing (Document)
+import Page.Home as Home
+import Ports.Incoming
+import Route exposing (Route)
+import Session exposing (Session)
+import Url exposing (Url)
 import Util.Cmd as CmdUtil
-import Util.Html as HtmlUtil
-
-
-
---------------------------------------------------------------------------------
--- TYPES --
---------------------------------------------------------------------------------
-
-
-type alias Model =
-    { field : String
-    , timesEnterWasPressed : Int
-    , squareOfEnterPresses : Int
-    }
-
-
-type Msg
-    = FieldUpdated String
-    | EnterHappened
-    | ReceivedSquare Int
-    | MsgDecodeFailed Decode.Error
-
-
-type JsMsg
-    = ConsoleLog String
-    | Square Int
-
-
-
---------------------------------------------------------------------------------
--- HELPERS --
---------------------------------------------------------------------------------
-
-
-setField : String -> Model -> Model
-setField newField model =
-    { model | field = newField }
-
-
-setSquareOfEnterPresses : Int -> Model -> Model
-setSquareOfEnterPresses newSquare model =
-    { model | squareOfEnterPresses = newSquare }
-
-
-incrementTimesEnterWasPressed : Model -> Model
-incrementTimesEnterWasPressed model =
-    { model | timesEnterWasPressed = model.timesEnterWasPressed + 1 }
 
 
 
@@ -66,20 +22,64 @@ incrementTimesEnterWasPressed model =
 main : Program Decode.Value Model Msg
 main =
     { init = init
-    , view = view
+    , view = Layout.toBrowserDocument << view
     , update = update
     , subscriptions = subscriptions
+    , onUrlRequest = UrlRequested
+    , onUrlChange = RouteChanged << Route.fromUrl
     }
-        |> Browser.document
+        |> Browser.application
 
 
-init : Decode.Value -> ( Model, Cmd Msg )
-init _ =
-    { field = ""
-    , timesEnterWasPressed = 0
-    , squareOfEnterPresses = 0
-    }
-        |> CmdUtil.withNoCmd
+
+--------------------------------------------------------------------------------
+-- TYPES --
+--------------------------------------------------------------------------------
+
+
+type Model
+    = PageNotFound Session
+    | Home Home.Model
+
+
+type Msg
+    = MsgDecodeFailed Ports.Incoming.Error
+    | UrlRequested UrlRequest
+    | RouteChanged (Maybe Route)
+    | HomeMsg Home.Msg
+
+
+
+--------------------------------------------------------------------------------
+-- INIT --
+--------------------------------------------------------------------------------
+
+
+init : Decode.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init json url navKey =
+    let
+        session : Session
+        session =
+            Session.init navKey
+    in
+    PageNotFound session
+        |> handleRouteChange (Route.fromUrl url)
+
+
+
+--------------------------------------------------------------------------------
+-- INTERNAL HELPERS --
+--------------------------------------------------------------------------------
+
+
+getSession : Model -> Session
+getSession model =
+    case model of
+        PageNotFound session ->
+            session
+
+        Home subModel ->
+            Home.getSession subModel
 
 
 
@@ -91,37 +91,44 @@ init _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        FieldUpdated str ->
-            model
-                |> setField str
-                |> CmdUtil.withNoCmd
-
-        EnterHappened ->
-            let
-                newModel : Model
-                newModel =
-                    incrementTimesEnterWasPressed model
-            in
-            ( newModel
-            , logAndSquare newModel
-            )
-
-        ReceivedSquare newSquare ->
-            model
-                |> setSquareOfEnterPresses newSquare
-                |> CmdUtil.withNoCmd
-
         MsgDecodeFailed _ ->
             model
                 |> CmdUtil.withNoCmd
 
+        UrlRequested urlRequest ->
+            model
+                |> CmdUtil.withNoCmd
 
-logAndSquare : Model -> Cmd Msg
-logAndSquare model =
-    [ sendToJs (ConsoleLog model.field)
-    , sendToJs (Square model.timesEnterWasPressed)
-    ]
-        |> Cmd.batch
+        RouteChanged maybeRoute ->
+            handleRouteChange maybeRoute model
+
+        HomeMsg subMsg ->
+            case model of
+                Home subModel ->
+                    Home.update subMsg subModel
+                        |> CmdUtil.mapBoth Home HomeMsg
+
+                _ ->
+                    ( model, Cmd.none )
+
+
+handleRouteChange : Maybe Route -> Model -> ( Model, Cmd Msg )
+handleRouteChange maybeRoute model =
+    let
+        session =
+            getSession model
+    in
+    case maybeRoute of
+        Nothing ->
+            PageNotFound session
+                |> CmdUtil.withNoCmd
+
+        Just route ->
+            case route of
+                Route.Landing ->
+                    ( Home <| Home.init session
+                    , Cmd.none
+                    )
 
 
 
@@ -130,68 +137,17 @@ logAndSquare model =
 --------------------------------------------------------------------------------
 
 
-view : Model -> Browser.Document Msg
+view : Model -> Document Msg
 view model =
-    { title = "Gulp Elm Boilerplate"
-    , body =
-        [ Style.globals
-        , title
-        , inputField model
-        , enterCount model
-        , squareOfCount model
-        ]
-            |> List.map Html.toUnstyled
-    }
+    case model of
+        PageNotFound _ ->
+            Layout.document
+                "Page not found"
+                [ Html.text "Page not found!" ]
 
-
-title : Html Msg
-title =
-    Html.p
-        [ Attrs.css [ Style.bigFont ] ]
-        [ Html.text "Elm Project : Go!" ]
-
-
-inputField : Model -> Html Msg
-inputField model =
-    Html.input
-        [ Attrs.value model.field
-        , Events.onInput FieldUpdated
-        , Attrs.placeholder "Press enter to console log msg"
-        , Attrs.spellcheck False
-        , HtmlUtil.onEnter EnterHappened
-        ]
-        []
-
-
-enterCount : Model -> Html Msg
-enterCount model =
-    Html.p
-        []
-        [ Html.text (enterText model) ]
-
-
-enterText : Model -> String
-enterText model =
-    [ "Enter was pressed"
-    , String.fromInt model.timesEnterWasPressed
-    , "times"
-    ]
-        |> String.join " "
-
-
-squareOfCount : Model -> Html Msg
-squareOfCount model =
-    Html.p
-        []
-        [ Html.text (squareText model) ]
-
-
-squareText : Model -> String
-squareText model =
-    [ "The square of the number of times enter was pressed is"
-    , String.fromInt model.squareOfEnterPresses
-    ]
-        |> String.join " "
+        Home subModel ->
+            Home.view subModel
+                |> Layout.map HomeMsg
 
 
 
@@ -201,65 +157,17 @@ squareText model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    fromJs decodeMsg
+subscriptions model =
+    Ports.Incoming.subscription
+        MsgDecodeFailed
+        (incomingPortsListeners model)
 
 
-decodeMsg : Decode.Value -> Msg
-decodeMsg json =
-    let
-        decoder : Decoder Msg
-        decoder =
-            Decode.string
-                |> Decode.field "type"
-                |> Decode.andThen
-                    (Decode.field "payload" << payloadDecoder)
-    in
-    case Decode.decodeValue decoder json of
-        Ok msg ->
-            msg
+incomingPortsListeners : Model -> Ports.Incoming.Listener Msg
+incomingPortsListeners model =
+    case model of
+        PageNotFound _ ->
+            Ports.Incoming.none
 
-        Err err ->
-            MsgDecodeFailed err
-
-
-payloadDecoder : String -> Decoder Msg
-payloadDecoder type_ =
-    case type_ of
-        "square computed" ->
-            Decode.int
-                |> Decode.map ReceivedSquare
-
-        _ ->
-            Decode.fail ("Unrecognized Msg type -> " ++ type_)
-
-
-
---------------------------------------------------------------------------------
--- PORTS --
---------------------------------------------------------------------------------
-
-
-port toJs : Encode.Value -> Cmd msg
-
-
-port fromJs : (Encode.Value -> msg) -> Sub msg
-
-
-sendToJs : JsMsg -> Cmd msg
-sendToJs msg =
-    let
-        toCmd : String -> Encode.Value -> Cmd msg
-        toCmd type_ payload =
-            [ ( "type", Encode.string type_ )
-            , ( "payload", payload )
-            ]
-                |> Encode.object
-                |> toJs
-    in
-    case msg of
-        ConsoleLog str ->
-            toCmd "consoleLog" (Encode.string str)
-
-        Square int ->
-            toCmd "square" (Encode.int int)
+        Home _ ->
+            Ports.Incoming.map HomeMsg Home.incomingPortsListener
