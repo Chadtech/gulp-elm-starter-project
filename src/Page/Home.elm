@@ -139,7 +139,7 @@ logAndSquare model =
 view : Model -> Document Msg
 view model =
     Layout.document
-        "Gulp Elm Boilerplate"
+        "Gulp Elm Starter Project"
         [ title
         , inputField model
         , enterCount model
