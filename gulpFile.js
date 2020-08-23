@@ -1,61 +1,60 @@
-var gulp = require("gulp");
-var source = require("vinyl-source-stream");
-var buffer = require("vinyl-buffer");
-var cp = require("child_process");
-var browserify = require("browserify");
-var util = require("gulp-util");
+const { src, dest, parallel, series, watch } = require('gulp');
+const elm = require('gulp-elm');
+const fs = require('fs');
+const http require('http');
 
-
-var paths = {
-  public: "./public",
-  dist: "./dist",
-  mainElm: "./src/Main.elm",
-  elm: "./src/**/*.elm",
-  js: "./src/*.js"
+const model = {
+    optimizeElm : false,
 };
 
+function devDestDir(path) {
+    const root = "./public";
+    if (typeof path === "undefined") {
+        return root;
+    }
+    return root + "/" + path;
+}
 
-gulp.task("js", function () {
-  return browserify("./src/app.js")
-    .bundle()
-    .pipe(source("app.js"))
-    .pipe(buffer())
-    .pipe(gulp.dest(paths.public));
-});
+function compile_elm() {
+    return src('src/Main.elm')
+        .pipe(elm.bundle("elm.js", {
+            optimize: model.optimizeElm,
+            elm: "./node_modules/elm/bin/elm"
+        }))
+        .pipe(dest(devDestDir()));
+}
 
+function compileElmBasic(params) {
+    return src('src/Main.elm')
+        .pipe(elm.bundle("elm.js", {
+            optimize: params.optimize,
+            elm: "./node_modules/elm/bin/elm"
+        }))
+        .pipe(dest(devDestDir()));
+}
 
-gulp.task("elm", function () {
-  util.log(util.colors.cyan("Elm"), "starting");
-  cp.spawn("elm", [
-    "make",
-    paths.mainElm,
-    "--output",
-    paths.public + "/elm.js"
-  ], {
-      stdio: 'inherit'
-    }).on("close", function (code) {
-      util.log(util.colors.cyan("Elm"), "closed");
-    });
-});
+function compile_js() {
+    return src("src/app.js").pipe(dest(devDestDir()));
+}
 
+function dev_server() {
+    const requestListener = function (req, res) {
+        res.writeHead(200);
+        res.end('Hello, World!');
+    }
 
-gulp.task("server", function () {
-  return require("./server")(2957, util.log);
-});
+    const server = http.createServer(requestListener);
+    server.listen(8080);
+}
 
+exports.dev = function() {
+    parallel(compile_elm, compile_js)();
+    watch("src/**/*.elm", compile_elm);
+    watch("src/app.js", compile_js);
+}
 
-gulp.task("dist", function () {
-  production = true;
-  gulp.task("default");
-
-  return gulp
-    .src(paths.public + "/**/*")
-    .pipe(gulp.dest(paths.dist));
-})
-
-
-gulp.watch(paths.elm, ["elm"]);
-gulp.watch(paths.js, ["js"]);
-
-
-gulp.task("default", ["elm", "js", "server"]);
+exports.buildProd = function(cb) {
+    model.optimizeElm = true;
+    series(compile_elm, compile_js)();
+    cb();
+}
