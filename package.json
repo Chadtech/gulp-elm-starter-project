@@ -10,7 +10,7 @@
     "express": "^4.17.1",
     "gulp": "^4.0.2",
     "gulp-elm": "^0.8.2",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.21"
   },
   "scripts": {
     "test": "./node_modules/.bin/elm-test",
