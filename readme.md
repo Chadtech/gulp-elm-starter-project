@@ -4,7 +4,7 @@ Its basically a template development environment with my favorite tooling and wh
 
 How to get going..
 ```
-git clone git@github.com:Chadtech/gulp-elm-starter-project.git
+git clone git@github.com:Chadtech/gulp-elm-starter-project.git new-project
 cd new-project
 npm install
 npm run dev
