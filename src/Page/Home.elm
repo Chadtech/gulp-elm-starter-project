@@ -1,13 +1,13 @@
 module Page.Home exposing
     ( Model
     , Msg
-    , getSession
     , incomingPortsListener
     , init
     , update
     , view
     )
 
+import Global exposing (Global)
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attrs
 import Html.Styled.Events as Events
@@ -15,7 +15,6 @@ import Json.Decode as Decode
 import Layout exposing (Document)
 import Ports.Incoming
 import Ports.Outgoing
-import Session exposing (Session)
 import Style
 import Util.Cmd as CmdUtil
 import Util.Html as HtmlUtil
@@ -28,7 +27,7 @@ import Util.Html as HtmlUtil
 
 
 type alias Model =
-    { session : Session
+    { global : Global
     , field : String
     , timesEnterWasPressed : Int
     , squareOfEnterPresses : Int
@@ -47,9 +46,9 @@ type Msg
 --------------------------------------------------------------------------------
 
 
-init : Session -> Model
-init session =
-    { session = session
+init : Global -> Model
+init global =
+    { global = global
     , field = ""
     , timesEnterWasPressed = 0
     , squareOfEnterPresses = 0
@@ -75,17 +74,6 @@ setSquareOfEnterPresses newSquare model =
 incrementTimesEnterWasPressed : Model -> Model
 incrementTimesEnterWasPressed model =
     { model | timesEnterWasPressed = model.timesEnterWasPressed + 1 }
-
-
-
---------------------------------------------------------------------------------
--- API --
---------------------------------------------------------------------------------
-
-
-getSession : Model -> Session
-getSession model =
-    model.session
 
 
 

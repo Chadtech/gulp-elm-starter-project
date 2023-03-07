@@ -1,5 +1,5 @@
-module Session exposing
-    ( Session
+module Global exposing
+    ( Global
     , init
     )
 
@@ -12,7 +12,7 @@ import Browser.Navigation as Nav
 ---------------------------------------------------------------
 
 
-type alias Session =
+type alias Global =
     { navKey : Nav.Key }
 
 
@@ -22,6 +22,7 @@ type alias Session =
 ---------------------------------------------------------------
 
 
-init : Nav.Key -> Session
+init : Nav.Key -> Global
 init navKey =
     { navKey = navKey }
+

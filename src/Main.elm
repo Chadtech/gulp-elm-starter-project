@@ -2,13 +2,13 @@ module Main exposing (main)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Nav
+import Global exposing (Global)
 import Html.Styled as Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
 import Layout exposing (Document)
 import Page.Home as Home
 import Ports.Incoming
 import Route exposing (Route)
-import Session exposing (Session)
 import Url exposing (Url)
 import Util.Cmd as CmdUtil
 
@@ -38,7 +38,7 @@ main =
 
 
 type Model
-    = PageNotFound Session
+    = PageNotFound Global
     | Home Home.Model
 
 
@@ -58,11 +58,11 @@ type Msg
 init : Decode.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init json url navKey =
     let
-        session : Session
-        session =
-            Session.init navKey
+        global : Global
+        global =
+            Global.init navKey
     in
-    PageNotFound session
+    PageNotFound global
         |> handleRouteChange (Route.fromUrl url)
 
 
@@ -72,14 +72,14 @@ init json url navKey =
 --------------------------------------------------------------------------------
 
 
-getSession : Model -> Session
-getSession model =
+getGlobal : Model -> Global
+getGlobal model =
     case model of
-        PageNotFound session ->
-            session
+        PageNotFound global ->
+            global
 
         Home subModel ->
-            Home.getSession subModel
+            subModel.global
 
 
 
@@ -115,18 +115,18 @@ update msg model =
 handleRouteChange : Maybe Route -> Model -> ( Model, Cmd Msg )
 handleRouteChange maybeRoute model =
     let
-        session =
-            getSession model
+        global =
+            getGlobal model
     in
     case maybeRoute of
         Nothing ->
-            PageNotFound session
+            PageNotFound global
                 |> CmdUtil.withNoCmd
 
         Just route ->
             case route of
                 Route.Landing ->
-                    ( Home <| Home.init session
+                    ( Home <| Home.init global
                     , Cmd.none
                     )
 
