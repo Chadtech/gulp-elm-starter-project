@@ -10,7 +10,7 @@ module.exports = function (PORT, log) {
 
   app.use(express.static(join(__dirname, '/public')));
 
-  app.get('/', function (req, res, next) {
+  app.get('*', function (req, res, next) {
     var indexPage = join(__dirname, 'public/index.html');
     return res.status(200).sendFile(indexPage);
   })
